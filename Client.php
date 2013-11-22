@@ -160,6 +160,14 @@ class Client implements Stdlib\DispatchableInterface
             $this->config[str_replace(array('-', '_', ' ', '.'), '', strtolower($k))] = $v; // replace w/ normalized
         }
 
+        // If, at this point, the adapter is null, check if the configuration options has an adapter specified
+        if (null === $this->adapter) {
+            if (isset($this->config['adapter']) && class_exists($this->config['adapter'])) {
+                $adapterClass = $this->config['adapter'];
+                $this->setAdapter(new $adapterClass());
+            }
+        }
+
         // Pass configuration options to the adapter if it exists
         if ($this->adapter instanceof Client\Adapter\AdapterInterface) {
             $this->adapter->setOptions($options);
